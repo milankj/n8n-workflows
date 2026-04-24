@@ -1,0 +1,115 @@
+{
+  "name": "Workflow Error Mail",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        -80
+      ],
+      "id": "4b875696-6666-4186-84a9-a76300c5eb14",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"from_mail\": \"frommail@gmail.com\",\n  \"to_mail_ids\": \"test@gmail.com,test2@gmail.com\",\n  \"subject\": \"{{ $('Error Trigger').item.json.workflow.name }} Error\",\n  \"email_body\": \"{{ $json.html }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        -80
+      ],
+      "id": "7a2f6e29-1693-4e7c-a5ef-216fd9f9a581",
+      "name": "Configure Fields"
+    },
+    {
+      "parameters": {
+        "html": "<h2>Workflow Details</h2>\n<p>Workflow Name: {{ $json.workflow.name }} </p>\n<h2>Execution Details</h2>\n<p>Please see execution details at <a href=\"{{ $json.execution.url }}\">workflow execution url</a></p>\n<h3>DateTime</h3>\n<p>{{ $now }}</p>\n<h3>Last Node Executed</h3>\n<p>{{ $json.execution.lastNodeExecuted }}</p>\n<h3>Mode</h3>\n<p>{{ $json.execution.mode }}</p>\n<h3>Message</h3>\n<p>{{ $json.execution.error.message }}</p>\n<h3>Stack trace</h3>\n<pre>\n{{ $json.execution.error.stack }}\n</pre>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        -80
+      ],
+      "id": "48d971b4-73f4-498e-bfcf-094945aa9f5e",
+      "name": "Generate Template"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to_mails }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.email_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        -80
+      ],
+      "id": "5772385d-399c-40b8-800b-2d56b9042d04",
+      "name": "Send Mail",
+      "webhookId": "ef729e27-9c8d-4370-a91a-fcbf891cb030",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jMJINY79oKJGWX9q",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure Fields": {
+      "main": [
+        [
+          {
+            "node": "Send Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Template": {
+      "main": [
+        [
+          {
+            "node": "Configure Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "490e161a-eb8b-4a9d-a68d-7f5b76ced402",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a9bd6795afedc23607164418386f87c8999e5c19620825145ccc8744d25f67d4"
+  },
+  "id": "K7q6LFz5jPq1adrp",
+  "tags": []
+}
